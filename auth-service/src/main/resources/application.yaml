@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: auth-service
+  config:
+    import: "optional:configserver:http://localhost:8088"
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_database
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
