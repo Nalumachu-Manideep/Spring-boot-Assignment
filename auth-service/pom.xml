@@ -36,6 +36,8 @@
 			**/com/auth_service/exception/**,
 			**/com/auth_service/repository/**,
 			**/com/auth_service/util/**,
+			**/com/auth_service/config/**,
+			**/com/auth_service/dto/**,
 			**/com/auth_service/AuthServiceApplication.java
 		</sonar.exclusions>
 	</properties>

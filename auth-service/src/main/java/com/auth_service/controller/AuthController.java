@@ -37,6 +37,9 @@ public class AuthController {
 
     @PostMapping(Constants.TOKEN_URL)
     public String getToken(@RequestBody AuthRequest authRequest) {
+        if (authRequest == null || authRequest.getUsername() == null || authRequest.getPassword() == null) {
+            throw new InvalidCredentialsException("Authentication failed: null");
+        }
         String token = "";
         try {
             Authentication authenticate = authenticationManager.authenticate(

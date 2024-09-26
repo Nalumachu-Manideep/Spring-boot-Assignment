@@ -110,6 +110,59 @@ public class AuthControllerTest {
     }
 
     @Test
+    public void getToken_AuthenticationNotAuthenticated_ShouldNotReturnToken() {
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(authentication.isAuthenticated()).thenReturn(false); // Not authenticated
+
+        String token = authController.getToken(authRequest);
+
+        assertEquals("", token); // Expect an empty token since not authenticated
+        verify(authService, never()).generateToken(anyString());
+    }
+
+    @Test
+    public void getToken_NullAuthRequest_ShouldThrowInvalidCredentialsException() {
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> authController.getToken(null));
+
+        assertEquals("Authentication failed: null", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any());
+        verify(authService, never()).generateToken(anyString());
+    }
+
+    @Test
+    public void getToken_EmptyUsername_ShouldThrowInvalidCredentialsException() {
+        authRequest.setUsername(null); 
+
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> authController.getToken(authRequest));
+
+        assertEquals("Authentication failed: null", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any());
+        verify(authService, never()).generateToken(anyString());
+    }
+
+    @Test
+    public void getToken_EmptyPassword_ShouldThrowInvalidCredentialsException() {
+        authRequest.setPassword(null);
+
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> authController.getToken(authRequest));
+
+        assertEquals("Authentication failed: null", exception.getMessage());
+        verify(authenticationManager, never()).authenticate(any());
+        verify(authService, never()).generateToken(anyString());
+    }
+
+    @Test
+    public void getToken_AuthenticationException_ShouldThrowInvalidCredentialsException() {
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new RuntimeException("Specific auth error"));
+
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> authController.getToken(authRequest));
+
+        assertEquals("Authentication failed: Specific auth error", exception.getMessage());
+        verify(authService, never()).generateToken(anyString());
+    }
+
+    @Test
     public void validateToken_ValidToken_ShouldReturnSuccessMessage() {
         String token = "validToken";
         doNothing().when(authService).validateToken(token);
